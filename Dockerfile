@@ -1,17 +1,24 @@
-FROM node:16-slim as node-build
+FROM node:10-slim as node-build
 
-ARG NPM_CONFIG__AUTH
-ARG NPM_CONFIG_REGISTRY=https://workivaeast.jfrog.io/workivaeast/api/npm/npm-prod/
-ARG NPM_CONFIG_ALWAYS_AUTH=true
 ARG GIT_TAG
+ARG NPMRC
+ARG NPM_CONFIG_USERCONFIG=$pwd/.npmrc
+RUN echo "$NPMRC" > $NPM_CONFIG_USERCONFIG
+# ARG NPM_CONFIG__AUTH
+# ARG NPM_CONFIG_REGISTRY=https://workivaeast.jfrog.io/workivaeast/api/npm/npm-prod/
+# ARG NPM_CONFIG_ALWAYS_AUTH=true
 
 WORKDIR /build/
-
 COPY package.json /build/
-RUN npm update --location=global && \
-    npm install --include=dev
 
-COPY . /build/ 
+RUN cat $NPM_CONFIG_USERCONFIG
+RUN npm --version
+RUN npm update --location=global
+RUN npm --version
+RUN npm install --include=dev
+RUN npm config get registry
+
+COPY . /build/
 
 # The following command replaces the version string in package.json
 ARG VERSION=${GIT_TAG:-0.0.0}
