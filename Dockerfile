@@ -1,23 +1,22 @@
 FROM node:19-slim as node-build
 
-ARG NPM_CONFIG__AUTH
-ARG NPM_CONFIG_REGISTRY=https://workivaeast.jfrog.io/workivaeast/api/npm/npm-prod/
-ARG NPM_CONFIG_ALWAYS_AUTH=true
 ARG GIT_TAG
-
-RUN reg=$(echo "$NPM_CONFIG_REGISTRY" | cut -d ":" -f 2) && \
-    echo "$reg:_auth = $NPM_CONFIG__AUTH" > /.npmrc && \
-    echo "registry = $NPM_CONFIG_REGISTRY" >> /.npmrc && \
-    echo "always-auth = true" >> /.npmrc
-ARG NPM_CONFIG_USERCONFIG=/.npmrc
-
+ARG NPMRC
+ARG NPM_CONFIG_USERCONFIG=$pwd/.npmrc
+RUN echo "$NPMRC" > $NPM_CONFIG_USERCONFIG
+# ARG NPM_CONFIG__AUTH
+# ARG NPM_CONFIG_REGISTRY=https://workivaeast.jfrog.io/workivaeast/api/npm/npm-prod/
+# ARG NPM_CONFIG_ALWAYS_AUTH=true
 
 WORKDIR /build/
-
 COPY package.json /build/
-RUN npm install --include=dev
 
-COPY . /build/
+RUN cat $NPM_CONFIG_USERCONFIG
+RUN npm --version
+RUN npm update --location=global
+RUN npm --version
+RUN npm install --include=dev
+RUN npm config get registry
 
 # The following command replaces the version string in package.json
 ARG VERSION=${GIT_TAG:-0.0.0}
