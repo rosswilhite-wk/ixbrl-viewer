@@ -4,7 +4,7 @@ ARG GIT_TAG
 ARG NPMRC
 ARG NPM_CONFIG_USERCONFIG=$pwd/.npmrc
 RUN echo "$NPMRC" > $NPM_CONFIG_USERCONFIG
-# ARG NPM_CONFIG__AUTH
+# ARG NPM_CONFIG__AUTH 
 # ARG NPM_CONFIG_REGISTRY=https://workivaeast.jfrog.io/workivaeast/api/npm/npm-prod/
 # ARG NPM_CONFIG_ALWAYS_AUTH=true
 
