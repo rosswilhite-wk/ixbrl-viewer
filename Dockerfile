@@ -1,4 +1,4 @@
-FROM node:10-slim as node-build
+FROM node:19-slim as node-build
 
 ARG GIT_TAG
 ARG NPMRC
@@ -7,6 +7,13 @@ RUN echo "$NPMRC" > $NPM_CONFIG_USERCONFIG
 # ARG NPM_CONFIG__AUTH
 # ARG NPM_CONFIG_REGISTRY=https://workivaeast.jfrog.io/workivaeast/api/npm/npm-prod/
 # ARG NPM_CONFIG_ALWAYS_AUTH=true
+
+RUN reg=$(echo "$NPM_CONFIG_REGISTRY" | cut -d ":" -f 2) && \
+    echo "$reg:_auth = $NPM_CONFIG__AUTH" > /.npmrc && \
+    echo "registry = $NPM_CONFIG_REGISTRY" >> /.npmrc && \
+    echo "always-auth = true" >> /.npmrc
+ARG NPM_CONFIG_USERCONFIG=/.npmrc
+
 
 WORKDIR /build/
 COPY package.json /build/
